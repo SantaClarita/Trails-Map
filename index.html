@@ -1,0 +1,25 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <title>Create a Map</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=7,IE=9" />
+  <link rel="stylesheet" type="text/css" href="http://serverapi.arcgisonline.com/jsapi/arcgis/2.3/js/dojo/dijit/themes/claro/claro.css">
+  <script type="text/javascript" src="http://serverapi.arcgisonline.com/jsapi/arcgis/?v=2.3"></script>
+  <script type="text/javascript">
+    dojo.require("esri.map");
+    var map;
+    function init() {
+      map = new esri.Map("mapDiv");
+      var basemapURL= "http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer"
+      var basemap = new esri.layers.ArcGISTiledMapServiceLayer(basemapURL);
+      map.addLayer(basemap);
+    }
+
+    dojo.addOnLoad(init);
+  </script>
+</head>
+<body class="claro">
+  <div id="mapDiv" style="width:900px; height:600px; border:1px solid #000;"></div>
+</body>
+</html>
