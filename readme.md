@@ -8,7 +8,7 @@ Installation
 
 Requirements
 ------------
-This uses the ArcGIS Javascript API which can be found [http://help.arcgis.com/en/webapi/javascript/arcgis/help/jsapi_start.htm]here
+This uses the ArcGIS Javascript API which can be found here [http://help.arcgis.com/en/webapi/javascript/arcgis/help/jsapi_start.htm]
 
 Documentation
 -------------
