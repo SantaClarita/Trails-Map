@@ -1,31 +1,23 @@
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+  <html manifest="mobile.manifest">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=7,IE=9" />
-    <meta name="viewport" content="initial-scale=1.0, width=device-width, maximum-scale=1.0, user-scalable=no"/>
-    <!-- meta tags to hide url and minimize status bar to give the web app
-    a native app look this only happens after app is saved to the desktop-->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="translucent-black"
-    />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=7,IE=9" />
+    <!--The viewport meta tag is used to improve the presentation and behavior
+    of the samples on iOS devices-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
     <title>
-      Mobile API
+      Mobile Trails Map
     </title>
-    <script type="text/javascript" src="http://serverapi.arcgisonline.com/jsapi/arcgis/?v=2.3compact">
-    </script>
-    <!-- Details about the Webkit CSS Properties http://css-infos.net/properties/webkit.php
-    and http://www.pointabout.com/category/development-blog/pointabout-dev-help/-->
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a4.1/jquery.mobile-1.0a4.1.min.css"/>
+
+    <!-- ArcGIS API for JavaScript -->
+    <script type="text/javascript" src="http://serverapi.arcgisonline.com/jsapi/arcgis/?v=2.3compact"> </script>
+    <script src="http://code.jquery.com/jquery-1.5.2.min.js"> </script>
+    <script src="http://code.jquery.com/mobile/1.0a4.1/jquery.mobile-1.0a4.1.min.js"></script>
+
     <style type="text/css">
-      html, body
-      {
-        height: 100%;
-        margin: 0px;
-        padding: 0px;
-        width: 100%;
-      }
+    body { font-family: Arial, Helvetica, sans-serif; }
      @-webkit-keyframes
        pulse
       {
@@ -33,121 +25,186 @@
         {
           opacity: 1.0;
           -webkit-transform: scale(1.25);
-
         }
         45%
         {
-          opacity: .20;
+          opacity: .60;
           -webkit-transform: scale(.80);
-
         }
         100%
         {
           opacity: 1.0;
           -webkit-transform: scale(1.25);
-
         }
       }
-      #map_graphics_layer
-      {
+
+      #map_graphics_layer{
         -webkit-animation-duration: 3s;
         -webkit-animation-iteration-count: infinite;
         -webkit-animation-name: pulse;
         -webkit-animation-timing-function: ease-in-out;
       }
+
+      #map{
+        width:100%;
+        height:100%;
+      }
+      /*.ui-bar-f {
+          border: 1px solid #005502;
+          background: #9d3f25;
+          color: #fff;
+          text-shadow: 0 1px 0 #fff;
+          background-image: -moz-linear-gradient(top, #92542c, #9d3f25);
+          background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #92542c),color-stop(1, #9d3f25));
+          -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#92542c', EndColorStr='#9d3f25')";
+        }*/
+
     </style>
     <script type="text/javascript">
+
+      //initialize dojo
       dojo.require("esri.map");
+      dojo.require("esri.layers.FeatureLayer");
+      dojo.require("dojo.parser");
+      dojo.require("esri.tasks.query")
+      dojo.require("esri.dijit.Legend");
+
+
+
+      dojo.addOnLoad(init);
+
       var map;
-      var graphic;
-      var currLocation;
+      var trailsLayer;
+      var query;
+
+
 
       function init() {
-       	 /*
-	        //Add the topographic layer to the map. View the ArcGIS Online site for services http://arcgisonline/home/search.html?t=content&f=typekeywords:service    
-	        var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer");
-	        map.addLayer(basemap);
+        //get the current location
+          if (navigator.geolocation) {
+           $.mobile.pageLoading(false); //true hides the dialog
+        //if you want to track as the user moves setup navigator.geolocation.watchPostion
+          navigator.geolocation.getCurrentPosition(initMap, locationError);
+        }
+      }
+      function initMap(location){
+     
+        map = new esri.Map("map");
 
-		 var dynlayer2 = new esri.layers.ArcGISDynamicMapServiceLayer("http://eos2/ArcGIS/rest/services/Misc/AGS_misc/MapServer/",{"opacity":0.5});
-		        map.addLayer(dynlayer2);*/
-				var initExtent = new esri.geometry.Extent({"xmin":-13204441.135492312,"ymin":4083458.830749193,"xmax":-13180611.891924439,"ymax":4089172.4986135024,"spatialReference":{"wkid":102100}});
-			        map = new esri.Map("map",{extent:initExtent});
-				        dojo.connect(map, "onLoad", initFunc);
-				        var tiledMapServiceLayer = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer");
-				        map.addLayer(tiledMapServiceLayer);
-				
-						var dynlayer2 = new esri.layers.ArcGISDynamicMapServiceLayer("http://eos2/ArcGIS/rest/services/Misc/AGS_misc/MapServer/",{"opacity":0.5});
-						        map.addLayer(dynlayer2);
+        //add the world imagery from arcgis online
+        var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer");
+        map.addLayer(basemap);
+        
+        dojo.connect(map,"onLoad",function(){
+          zoomToLocation(location);
+         //hookup jquery
+          $(document).ready(jQueryReady);
+        });
+
+
+        trailsLayer = new esri.layers.FeatureLayer("http://eos2/ArcGIS/rest/services/Misc/AGS_misc/MapServer/6", {
+          opacity:0.8,
+		  mode: esri.layers.FeatureLayer.MODE_ONDEMAND,
+          outFields: ["*"]
+        });
+
+        dojo.connect(map,"onClick",function(evt){
+          var query = new esri.tasks.Query();
+          query.geometry = evt.mapPoint;
+          
+          trailsLayer.selectFeatures(query,esri.layers.FeatureLayer.SELECTION_NEW,function(features){
+            //display page with soil info
+            var content = getWindowContent(features[0]);
+            $('#contentDiv').html(content);
+
+            $.mobile.pageLoading(true);
+            //navigate to the soil detail page
+            $.mobile.changePage("#attributePage",null,true,true);
+          });
+        });
+
+        map.addLayer(trailsLayer);
+        map.infoWindow.resize(200,250);
+      
+      }
+
+
+
+       function locationError(error) {
+        switch (error.code) {
+        case error.PERMISSION_DENIED:
+          console.log("Location not provided");
+          break;
+        case error.POSITION_UNAVAILABLE:
+          console.log("Current location not available");
+          break;
+        case error.TIMEOUT:
+          console.log("Timeout");
+          break;
+        default:
+          console.log("unknown error");
+          break;
+        }
+      }
+
+      function zoomToLocation(location) {
+        $.mobile.pageLoading(true); //true hides the dialog
+        var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(location.coords.longitude, location.coords.latitude));
+        map.centerAndZoom(pt, 13);
+        
+        //uncomment to add a graphic at the current location
+        var symbol = new esri.symbol.PictureMarkerSymbol("images/bluedot.png",40,40);
+        map.graphics.add(new esri.Graphic(pt,symbol));
+      }
+
+      function jQueryReady() {
+        //add the legend when user clicks the info button
+        $('#legendDialog').bind('pagebeforeshow',function(event,ui){
+          $(this).unbind(event);
+
+          var legend = new esri.dijit.Legend({
+            map:map,
+            respectCurrentMapScale:false,
+            layerInfos:[{layer:trailsLayer,title:"Dominant Soil Order"}]
+
+          },"legendDiv");
+          legend.startup();
+        });
 
       }
 
       function orientationChanged() {
-        console.log("Orientation changed: " + window.orientation);
         if(map){
           map.reposition();
           map.resize();
         }
       }
-
-
-      function initFunc(map) {
-        if(navigator.geolocation){  
-          navigator.geolocation.getCurrentPosition(zoomToLocation, locationError);
-          navigator.geolocation.watchPosition(showLocation, locationError);
-        }
-      }
-
-      function locationError(error) {
-        switch (error.code) {
-        case error.PERMISSION_DENIED:
-          alert("Location not provided");
-          break;
-
-        case error.POSITION_UNAVAILABLE:
-          alert("Current location not available");
-          break;
-
-        case error.TIMEOUT:
-          alert("Timeout");
-          break;
-
-        default:
-          alert("unknown error");
-          break;
-        }
-
-      }
-
-      function zoomToLocation(location) {
-        var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(location.coords.longitude, location.coords.latitude));    
-        map.centerAndZoom(pt, 16);
-      }
-
-      function showLocation(location) {
-        //zoom to the users location and add a graphic
-        var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point(location.coords.longitude, location.coords.latitude));
-        if (!graphic) {
-          var symbol = new esri.symbol.PictureMarkerSymbol('images/bluedot.png', 40, 40);
-          graphic = new esri.Graphic(pt, symbol);
-          map.graphics.add(graphic);
-        }
-        else { //move the graphic if it already exists
-          graphic.setGeometry(pt);
-        }
-        console.log("Accuracy: " + location.coords.accuracy);
-        console.log("Speed: " + location.coords.speed);
-        map.centerAt(pt);
-      }
-
-
-
-      dojo.addOnLoad(init);
     </script>
   </head>
-  
-  <body onorientationchange="orientationChanged();" >
-    <div id="map" style="width:100%; height:100%;">
+  <body onorientationchange="orientationChanged();">
+    <!--Each view is defined by a data-role="page" attribute-->
+    <div data-role="page"  id="mapPage" style="width:100%;height:100%;overflow:hidden;" data-theme="c">
+      <div id="header" data-role="header" data-theme='f' >
+        <h1>
+         <span class="title">Trails</span>
+        </h1>
+        <!--can add a data-icon and set text to none if desired-->
+        <a href="#legendDialog" data-rel="dialog" data-theme='a' class='ui-btn-right' data-role="button" data-icon="grid" data-iconpos="notext">View Legend</a>
+    
+       </div>
+      <div data-role="content" id="mapcontent" style="width:100%;height:100%;padding:0;">
+        <div id="map"></div>
+      </div>
     </div>
+  <!--Legend Dialog-->
+  <div data-role="dialog" id="legendDialog"  data-theme="f">
+    <div data-role="header">
+      <h1>Legend</h1>
+    </div>
+    <div data-role="content" >
+      <div id="legendDiv"></div>
+    </div>
+  </div>
   </body>
+  </html>
 
-</html>
