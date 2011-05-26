@@ -49,15 +49,15 @@
         width:100%;
         height:100%;
       }
-      /*.ui-bar-f {
-          border: 1px solid #005502;
-          background: #9d3f25;
+      .ui-bar-f {
+          border: 1px solid #4297d7;
+          background: #5c9ccc;
           color: #fff;
-          text-shadow: 0 1px 0 #fff;
-          background-image: -moz-linear-gradient(top, #92542c, #9d3f25);
-          background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #92542c),color-stop(1, #9d3f25));
-          -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#92542c', EndColorStr='#9d3f25')";
-        }*/
+          text-shadow: 0 1px 0 #d8e7f3;
+          background-image: -moz-linear-gradient(top, #79b7e7, #d0e5f5);
+          background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #79b7e7),color-stop(1, #d0e5f5));
+          -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#79b7e7', EndColorStr='#d0e5f5')";
+        }
 
     </style>
     <script type="text/javascript">
@@ -165,7 +165,7 @@
           var legend = new esri.dijit.Legend({
             map:map,
             respectCurrentMapScale:false,
-            layerInfos:[{layer:trailsLayer,title:"Dominant Soil Order"}]
+            layerInfos:[{layer:trailsLayer,title:"Trails"}]
 
           },"legendDiv");
           legend.startup();
