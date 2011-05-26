@@ -88,8 +88,8 @@
         }
       }
       function initMap(location){
-     
-        map = new esri.Map("map");
+     	var initialExtent = new esri.geometry.Extent({"xmin":-13204441.135492312,"ymin":4083458.830749193,"xmax":-13180611.891924439,"ymax":4089172.4986135024,"spatialReference":{"wkid":102100}});
+        map = new esri.Map("map", { extent: initialExtent});
 
         //add the world imagery from arcgis online
         var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer");
