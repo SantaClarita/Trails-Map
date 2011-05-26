@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=7,IE=9" />
+    <!--The viewport meta tag is used to improve the presentation and behavior of the samples 
+      on iOS devices-->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+    <title>Trails Map</title>
+    <link rel="stylesheet" type="text/css" href="http://serverapi.arcgisonline.com/jsapi/arcgis/2.3/js/dojo/dijit/themes/claro/claro.css">
+    <style>
+      html, body { height: 100%; width: 100%; margin: 0; padding: 0; }
+      .esriScalebar{
+        padding: 20px 20px;
+      }
+      #map{
+        padding:0;
+      }
+    </style>
+    <script type="text/javascript">var djConfig = {parseOnLoad: true};</script>
+    <script type="text/javascript" src="http://serverapi.arcgisonline.com/jsapi/arcgis/?v=2.3compact"></script>
+    <script type="text/javascript">
+      dojo.require("dijit.layout.BorderContainer");
+      dojo.require("dijit.layout.ContentPane");
+      dojo.require("esri.map");
+
+      
+      var map;
+      var resizeTimer;
+      
+  
+      function init() {
+        var initExtent = new esri.geometry.Extent({"xmin":-13204441.135492312,"ymin":4083458.830749193,"xmax":-13180611.891924439,"ymax":4089172.4986135024,"spatialReference":{"wkid":102100}});
+        map = new esri.Map("map",{extent:initExtent});
+        //Add the topographic layer to the map. View the ArcGIS Online site for services http://arcgisonline/home/search.html?t=content&f=typekeywords:service    
+        var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer");
+        map.addLayer(basemap);
+
+	 var dynlayer2 = new esri.layers.ArcGISDynamicMapServiceLayer("http://eos2/ArcGIS/rest/services/Misc/AGS_misc/MapServer/",{"opacity":0.5});
+	        map.addLayer(dynlayer2);
+
+        
+        //resize the map when the browser resizes - view the 'Resizing and repositioning the map' section in 
+        //the following help topic for more details http://help.esri.com/EN/webapi/javascript/arcgis/help/jshelp_start.htm#jshelp/inside_guidelines.htm
+        dojo.connect(map, 'onLoad', function(theMap) { 
+          dojo.connect(dijit.byId('map'), 'resize', function() {  //resize the map if the div is resized
+            clearTimeout(resizeTimer);
+            console.log('resize');
+            resizeTimer = setTimeout( function() {
+              map.resize();
+              map.reposition();
+            }, 500);
+          });
+        });
+      }
+
+      dojo.addOnLoad(init);
+    </script>
+  </head>
+  
+  <body class="claro">
+    <div dojotype="dijit.layout.BorderContainer" design="headline" gutters="false" style="width: 100%; height: 100%; margin: 0;">
+      <div id="map" dojotype="dijit.layout.ContentPane" region="center" style="border:1px solid #000;padding:0;">
+     </div>
+    </div>
+  </body>
+
+</html>
