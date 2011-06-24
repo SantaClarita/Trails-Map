@@ -102,7 +102,7 @@
         });
 
 
-        trailsLayer = new esri.layers.FeatureLayer("http://eos2/ArcGIS/rest/services/Misc/AGS_misc/MapServer/6", {
+		trailsLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://eos2/ArcGIS/rest/services/Misc/AGS_misc/MapServer/", {
           opacity:0.8,
 		  mode: esri.layers.FeatureLayer.MODE_ONDEMAND,
           outFields: ["*"]

@@ -38,7 +38,7 @@
         var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer");
         map.addLayer(basemap);
 
-        var trails = new esri.layers.FeatureLayer("http://eos2/ArcGIS/rest/services/Misc/AGS_misc/MapServer/6", {
+        var trails = new esri.layers.ArcGISDynamicMapServiceLayer("http://eos2/ArcGIS/rest/services/Misc/AGS_misc/MapServer/", {
           opacity:0.8,
 		  mode: esri.layers.FeatureLayer.MODE_ONDEMAND,
           outFields: ["*"]
