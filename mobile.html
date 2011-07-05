@@ -92,7 +92,7 @@
         map = new esri.Map("map", { extent: initialExtent});
 
         //add the world imagery from arcgis online
-        var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer");
+        var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/");
         map.addLayer(basemap);
         
         dojo.connect(map,"onLoad",function(){
